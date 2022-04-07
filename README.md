@@ -19,9 +19,9 @@ Vamos então incluir acima uma lista com atalhos a cada dois itens.
 
 A complexidade temporal pode ser calculada por: 
 
-![equation](http://www.sciweavers.org/tex2img.php?eq=%5Ctext%7BCusto%20temporal%7D%20%5Capprox%20%5Cmid%20L1%20%5Cmid%20%2B%20%5Cfrac%7B%5Cmid%20L0%20%5Cmid%7D%7B%5Cmid%20L1%20%5Cmid%7D&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0)
+![equation](https://latex.codecogs.com/svg.image?\text{Custo&space;temporal}&space;\approx&space;\mid&space;L1&space;\mid&space;&plus;&space;\frac{\mid&space;L0&space;\mid}{\mid&space;L1&space;\mid})
 
 ### Generalização
-Incluindo mais um nível a complexidade se torna ![equation](http://www.sciweavers.org/tex2img.php?eq=%203%20%5Csqrt%5B3%5D%7Bn%7D%20&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0)
+Incluindo mais um nível a complexidade se torna ![equation](https://latex.codecogs.com/svg.image?3\sqrt[3]{n})
 
 ![image](https://user-images.githubusercontent.com/29204714/162274763-6ba12002-8007-4b8c-a4df-5ff72551bfc4.png)
