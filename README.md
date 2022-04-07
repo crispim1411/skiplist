@@ -19,7 +19,7 @@ Vamos então incluir acima uma lista com atalhos a cada dois itens.
 
 A complexidade temporal pode ser calculada por: 
 
-![equation](http://www.sciweavers.org/tex2img.php?eq=%5Ctext%7BCusto%20temporal%7D%20%20%5Capprox%20%5Cmid%20L1%20%5Cmid%20%2B%20%5Cfrac%7B%20%5Cmid%20L0%20%5Cmid%20%7D%7B%5Cmid%20L1%5Cmid%7D%20&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0)
+![equation](http://www.sciweavers.org/tex2img.php?eq=%5Ctext%7BCusto%20temporal%7D%20%5Capprox%20%5Cmid%20L1%20%5Cmid%20%2B%20%5Cfrac%7B%5Cmid%20L0%20%5Cmid%7D%7B%5Cmid%20L1%20%5Cmid%7D&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0)
 
 ### Generalização
 Incluindo mais um nível a complexidade se torna ![equation](http://www.sciweavers.org/tex2img.php?eq=%203%20%5Csqrt%5B3%5D%7Bn%7D%20&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=0)
