@@ -1,5 +1,5 @@
 # SkipList
-SkipList, é uma estrutura descrita em 1989 por William Pugh que se baseia em balancear de forma probabilística atalhos de um item a outro.O objetivo deste projeto é de implementar uma Skip List em Rust. Dada a complexidade de desenvolvimento dado o gerenciamento de memória, foi decidido a implementação de estruturas intermediárias.
+SkipList é uma estrutura descrita em 1989 por William Pugh que se baseia em balancear de forma probabilística atalhos de um item a outro com objetivo de alcançar complexidade O(log(n)), sendo assim um substituto para árvores AVL. O objetivo deste projeto é de implementar uma Skip List em Rust, e dada a complexidade de desenvolvimento devido o gerenciamento de memória, foi decidido a implementação de estruturas intermediárias.
 
 ## Plano de desenvolvimento
 1. Stack: Entender o processo de substituição de um item por outro na cabeça da pilha ([link](https://github.com/crispim1411/skiplist/blob/master/src/stack.rs))
