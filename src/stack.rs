@@ -36,18 +36,36 @@ impl<T: Debug> Stack<T> {
         }
     }
 
-    pub fn print(&self) {
+    pub fn peek(&self) -> Option<&T> {
         match &self.head {
-            Some(_) => Stack::print_rec(self.head.as_ref()),
-            None => println!("Empty stack"),
+            Some(item) => Some(&item.as_ref().value),
+            None => None,
         }
-    }
-
-    fn print_rec(mut cursor: Option<&Box<Item<T>>>) {
-        while let Some(item) = cursor {
-            print!("{:?} ", item.value);
-            cursor = item.next.as_ref();
-        }
-        println!();
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn is_empty_test() {
+        let empty_stack: Stack<u32> = Stack::empty();
+        assert_eq!(empty_stack.peek(), None);
+    }
+
+    #[test]
+    fn push_item_test() {
+        let mut empty_stack = Stack::empty();
+        empty_stack.push(10);
+        assert_eq!(empty_stack.peek(), Some(&10));
+    }
+
+    #[test]
+    fn pop_item_test() {
+        let mut empty_stack = Stack::empty();
+        empty_stack.push(20);
+        empty_stack.push(30);
+        assert_eq!(empty_stack.pop(), Some(30));
+    }
+}
+
