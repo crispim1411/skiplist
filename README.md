@@ -19,9 +19,22 @@ Vamos então incluir acima uma lista com atalhos a cada dois itens.
 
 A complexidade temporal pode ser calculada por: 
 
-![equation](https://latex.codecogs.com/svg.image?\text{Custo&space;temporal}&space;\approx&space;\mid&space;L1&space;\mid&space;&plus;&space;\frac{\mid&space;L0&space;\mid}{\mid&space;L1&space;\mid})
+![equation](https://latex.codecogs.com/png.image?\dpi{110}\bg{white}\text{Custo&space;temporal}&space;\approx&space;\mid&space;L1&space;\mid&space;&plus;&space;\frac{\mid&space;L0&space;\mid}{\mid&space;L1&space;\mid}&space;)
+
+E para ![equation](https://latex.codecogs.com/png.image?\dpi{110}\bg{white}\mid&space;L1&space;\mid&space;^{2}&space;=&space;\mid&space;L0&space;\mid&space;=&space;n) temos que
+
+![equation](https://latex.codecogs.com/png.image?\dpi{110}\bg{white}\sqrt{n}&space;&plus;&space;\frac{n}{\sqrt{n}}&space;=&space;\frac{2n\sqrt{n}}{n}&space;=&space;2\sqrt{n}&space;)
+
+![equation](https://latex.codecogs.com/png.image?\dpi{110}\bg{white}\text{Custo&space;temporal}&space;=&space;O(\sqrt{n}))
 
 ### Generalização
-Incluindo mais um nível a complexidade se torna ![equation](https://latex.codecogs.com/svg.image?3\sqrt[3]{n})
+Incluindo mais um nível a complexidade se torna ![equation](https://latex.codecogs.com/png.image?\dpi{110}\bg{white}O(\sqrt[3]{n}))
 
 ![image](https://user-images.githubusercontent.com/29204714/162274763-6ba12002-8007-4b8c-a4df-5ff72551bfc4.png)
+
+Para k níveis temos uma complexidade ![equation](https://latex.codecogs.com/png.image?\dpi{110}\bg{white}O(\sqrt[k]{n})). O que aconteceria se tivessemos log(n) níveis? O resultado final, incrivelmente, é O(logn)
+
+## Randomização da estrutura
+Manter uma estrutura onde o nível acima é sempre a metade do nível anterior é muito custoso. Como solução temos a randomização dos níveis. Quando um novo nó é inserido na skiplist seu nível é randomizado, tendo uma probabilidade P de obter uma promoção de nível e probabilidade P^k de obter o nível máximo.
+
+![image](https://user-images.githubusercontent.com/29204714/162480390-97915e50-8ef5-49be-b133-d31f2dc766ed.png)
