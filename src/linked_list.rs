@@ -47,8 +47,7 @@ impl<T> LinkedList<T> where T: Debug + PartialOrd + Debug {
         if let Some(node) = cursor {
             if let Some(next_node) = &mut node.next {
                 if next_node.value < value {
-                    LinkedList::recursive_insert(&mut node.next, value);
-                    return
+                    return LinkedList::recursive_insert(&mut node.next, value);
                 } 
             } 
             let mut new_node = Node { value, next: None };
@@ -66,8 +65,20 @@ impl<T> LinkedList<T> where T: Debug + PartialOrd + Debug {
         }
     }
 
-    pub fn delete(&mut self) {
-        todo!()
+    pub fn delete(&mut self, value: T) {
+        todo!()    
+    }
+
+    #[allow(dead_code)]
+    fn get_node_ref<'a>(&self, cursor: &'a Link<T>, key: &T) -> &'a Link<T> {
+        if let Some(node) = cursor.as_ref() {
+            if let Some(next_node) = node.next.as_ref() {
+                if next_node.value < *key {
+                    return self.get_node_ref(&node.next, key);
+                }
+            }   
+        }
+        cursor
     }
 }
 
@@ -76,8 +87,30 @@ mod tests {
     use super::*;
     #[test]
     fn is_empty_test() {
-        let empty_LinkedList: LinkedList<u32> = LinkedList::empty();
-        assert_eq!(empty_LinkedList.head, None);
+        let empty_list: LinkedList<u32> = LinkedList::empty();
+        assert_eq!(empty_list.head, None);
+    }
+
+    #[test]
+    fn get_ref_test(){
+        let mut list = LinkedList::new(2);
+        list.insert(7);
+        list.insert(3);
+        list.insert(5);
+        let ref_node = list.get_node_ref(&list.head, &6);
+        assert_eq!(ref_node.as_ref().unwrap().value, 5);
+    }
+
+    #[test]
+    fn insert_test() {
+        let mut list = LinkedList::new(8);
+        list.insert(2);
+        list.insert(7);
+        list.insert(3);
+        list.insert(5);
+        assert_eq!(list.head.as_ref().unwrap().value, 2); //head
+        let ref_node = list.get_node_ref(&list.head, &10);
+        assert_eq!(ref_node.as_ref().unwrap().value, 8); //tail
     }
 }
 

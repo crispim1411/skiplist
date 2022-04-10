@@ -46,11 +46,33 @@ node: Option<Box<Node<T>>>
 node.as_ref().unwrap(): &Box<Node<T>>
 ```
 
-- Inserir uma referência entre dois nós
+- Pesquisa recursiva retornando referência de nó
 ```rust
-let mut new_node = Node { value, next: None };
-let old_value = mem::take(&mut node.next);
-new_node.next = old_value;
-node.next = Some(Box::new(new_node));
+fn get_node_ref<'a>(&self, cursor: &'a Link<T>, key: &T) -> &'a Link<T> {
+    if let Some(node) = cursor.as_ref() {
+        if let Some(next_node) = node.next.as_ref() {
+            if next_node.value < *key {
+                return self.get_node_ref(&node.next, key);
+            }
+        }   
+    }
+    cursor
+}
 ```
 
+- Inserir um novo nó
+```rust
+fn recursive_insert(cursor: &mut Link<T>, value: T) {
+    if let Some(node) = cursor {
+        if let Some(next_node) = &mut node.next {
+            if next_node.value < value {
+                return LinkedList::recursive_insert(&mut node.next, value);
+            } 
+        } 
+        let mut new_node = Node { value, next: None };
+        let old_value = mem::take(&mut node.next);
+        new_node.next = old_value;
+        node.next = Some(Box::new(new_node));
+    }
+}
+```

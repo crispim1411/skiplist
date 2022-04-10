@@ -2,6 +2,7 @@ use rand::Rng;
 use skiplist::stack::Stack;
 use skiplist::linked_list::LinkedList;
 
+#[allow(dead_code)]
 fn run_stack() {
     println!("*Viagem*");
     let mut stack = Stack::empty();
