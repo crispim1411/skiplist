@@ -26,21 +26,24 @@ impl<T> LinkedList<T> where T: Debug + PartialOrd + Debug {
     }
 
     pub fn insert(&mut self, value: T) {
+        // Lista vazia
         if self.head == None {
             self.head = Some(Box::new(Node { value, next: None }));
         } 
+        // Inserir um novo item como head
         else if value < self.head.as_ref().unwrap().value {
             let mut new_node = Node { value, next: None };
             let old_value = mem::take(&mut self.head);
             new_node.next = old_value;
             self.head = Some(Box::new(new_node));
         }
+        // Busca e inserção
         else  {
             LinkedList::recursive_insert(&mut self.head, value);
         }
     }
 
-    fn recursive_insert(cursor: &mut Option<Box<Node<T>>>, value: T) {
+    fn recursive_insert(cursor: &mut Link<T>, value: T) {
         if let Some(node) = cursor {
             if let Some(next_node) = &mut node.next {
                 if next_node.value < value {
