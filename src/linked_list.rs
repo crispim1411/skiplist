@@ -1,18 +1,20 @@
-use std::{fmt::Debug, mem, ops::DerefMut};
+use std::fmt::Debug;
+use std::mem;
+
+type Link<T> = Option<Box<Node<T>>>;
 
 #[derive(Debug, PartialEq)]
-struct Node<'a,T> {
-    value: &'a T,
-    next: Link<'a,T>,
-}
-type Link<'a,T> = Option<Box<Node<'a,T>>>;
-
-pub struct LinkedList<'a,T> {
-    head: Link<'a,T>
+struct Node<T> {
+    value: T,
+    next: Link<T>,
 }
 
-impl<'a,T> LinkedList<'a,T> where T: Debug + PartialOrd + Debug {
-    pub fn new(value: &'a T) -> Self {
+pub struct LinkedList<T> {
+    head: Link<T>
+}
+
+impl<T> LinkedList<T> where T: Debug + PartialOrd + Debug {
+    pub fn new(value: T) -> Self {
         let node = Node { value, next: None };
         Self {
             head: Some(Box::new(node))
@@ -23,9 +25,7 @@ impl<'a,T> LinkedList<'a,T> where T: Debug + PartialOrd + Debug {
         Self { head: None }
     }
 
-    
-
-    pub fn insert(&mut self, value: &'a T) {
+    pub fn insert(&mut self, value: T) {
         if self.head == None {
             self.head = Some(Box::new(Node { value, next: None }));
         } 
@@ -36,12 +36,23 @@ impl<'a,T> LinkedList<'a,T> where T: Debug + PartialOrd + Debug {
             self.head = Some(Box::new(new_node));
         }
         else  {
-            recursive_insert(&mut self.head, &value);
+            LinkedList::recursive_insert(&mut self.head, value);
         }
     }
 
-    pub fn delete(&mut self) {
-        todo!()
+    fn recursive_insert(cursor: &mut Option<Box<Node<T>>>, value: T) {
+        if let Some(node) = cursor {
+            if let Some(next_node) = &mut node.next {
+                if next_node.value < value {
+                    LinkedList::recursive_insert(&mut node.next, value);
+                    return
+                } 
+            } 
+            let mut new_node = Node { value, next: None };
+            let old_value = mem::take(&mut node.next);
+            new_node.next = old_value;
+            node.next = Some(Box::new(new_node));
+        }
     }
 
     pub fn display(&self) {
@@ -51,20 +62,9 @@ impl<'a,T> LinkedList<'a,T> where T: Debug + PartialOrd + Debug {
             cursor = &node.next;
         }
     }
-}
 
-fn recursive_insert<'a,T: Debug + PartialOrd>(cursor: &mut Option<Box<Node<'a,T>>>, value: &'a T) {
-    if let Some(node) = cursor {
-        if let Some(next_node) = &mut node.next {
-            if next_node.value < value {
-                recursive_insert(&mut node.next, value);
-                return
-            } 
-        } 
-        let mut new_node = Node { value, next: None };
-        let old_value = mem::take(&mut node.next);
-        new_node.next = old_value;
-        node.next = Some(Box::new(new_node));
+    pub fn delete(&mut self) {
+        todo!()
     }
 }
 

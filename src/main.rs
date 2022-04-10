@@ -1,3 +1,4 @@
+use rand::Rng;
 use skiplist::stack::Stack;
 use skiplist::linked_list::LinkedList;
 
@@ -26,17 +27,15 @@ fn run_stack() {
 }
 
 fn run_linked_list() {
-    println!("*Campeonato*");
+    println!("*Geração de números aleatórios*");
     let mut list = LinkedList::empty();
-    list.insert(&2.8);
-    list.insert(&7.5);
-    list.insert(&1.7);
-    list.insert(&8.1);
-    list.insert(&1.3);
-    list.insert(&6.9);
-    list.insert(&0.0);
-    println!("--------------------\nEncerramento");
-    println!("--------------------\nPódio");
+    let mut rng = rand::thread_rng();
+    for _ in 0..20 {
+        let random: f32 = rng.gen_range(0.0..100.0);
+        println!("Inserting: {}", random);
+        list.insert(random);
+    }
+    println!("--------------------\nFim");
     list.display();
 }
 
