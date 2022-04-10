@@ -38,3 +38,19 @@ Para k níveis temos uma complexidade ![equation](https://latex.codecogs.com/png
 Manter uma estrutura onde o nível acima é sempre a metade do nível anterior é muito custoso. Como solução temos a randomização dos níveis. Quando um novo nó é inserido na skiplist seu nível é randomizado, tendo uma probabilidade P de obter uma promoção de nível e probabilidade P^k de obter o nível máximo.
 
 ![image](https://user-images.githubusercontent.com/29204714/162480390-97915e50-8ef5-49be-b133-d31f2dc766ed.png)
+
+## Considerações da implementação
+- Manter referência quando abrir um Option
+```rust
+node: Option<Box<Node<T>>>
+node.as_ref().unwrap(): &Box<Node<T>>
+```
+
+- Inserir uma referência entre dois nós
+```rust
+let mut new_node = Node { value, next: None };
+let old_value = mem::take(&mut node.next);
+new_node.next = old_value;
+node.next = Some(Box::new(new_node));
+```
+
