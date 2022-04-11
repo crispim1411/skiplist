@@ -55,15 +55,25 @@ pub fn push(&mut self, value: T) {
 - Remover da pilha 
 ```rust
 pub fn pop(&mut self) -> Option<T> {
-        let old_head = self.head.take();
-        match old_head {
-            Some(item) => {
-                self.head = item.next;
-                Some(item.value)
-            }
-            None => None,
+    let old_head = self.head.take();
+    match old_head {
+        Some(item) => {
+            self.head = item.next;
+            Some(item.value)
         }
+        None => None,
     }
+}
+```
+
+- Olhar o topo da pilha
+```rust
+pub fn peek(&self) -> Option<&T> {
+    match &self.head {
+        Some(item) => Some(&item.as_ref().value),
+        None => None,
+    }
+}
 ```
 
 ## Linked List
