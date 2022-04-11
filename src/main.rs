@@ -27,7 +27,8 @@ fn run_stack() {
     }
 }
 
-fn run_linked_list() {
+#[allow(dead_code)]
+fn run_random_linked_list() {
     println!("*Geração de números aleatórios*");
     let mut list = LinkedList::empty();
     let mut rng = rand::thread_rng();
@@ -36,10 +37,24 @@ fn run_linked_list() {
         println!("Inserting: {}", random);
         list.insert(random);
     }
-    println!("--------------------\nFim");
+    println!("Fim--------------------");
+    list.display();
+}
+
+fn run_odd_linked_list() {
+    let last = 20;
+    println!("*Inserindo números de 0 a {}*", last);
+    let mut list = LinkedList::empty();
+    for i in 0..=last {
+        list.insert(i);
+    }
+    for j in (0..=last).step_by(2) {
+        println!("Removing {}", j);
+        list.delete(j);
+    }
     list.display();
 }
 
 fn main() {
-    run_linked_list();
+    run_odd_linked_list();
 }

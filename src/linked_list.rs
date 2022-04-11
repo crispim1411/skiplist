@@ -25,6 +25,14 @@ impl<T> LinkedList<T> where T: Debug + PartialOrd + Debug {
         Self { head: None }
     }
 
+    pub fn display(&self) {
+        let mut cursor = &self.head;
+        while let Some(node) = cursor {
+            println!("{:?}", node.value);
+            cursor = &node.next;
+        }
+    }
+
     pub fn insert(&mut self, value: T) {
         // Lista vazia
         if self.head == None {
@@ -57,16 +65,31 @@ impl<T> LinkedList<T> where T: Debug + PartialOrd + Debug {
         }
     }
 
-    pub fn display(&self) {
-        let mut cursor = &self.head;
-        while let Some(node) = cursor {
-            println!("{:?}", node.value);
-            cursor = &node.next;
+    pub fn delete(&mut self, value: T) {
+        if let Some(head_node) = &mut self.head{
+            if head_node.value == value {
+                let old_value = mem::take(&mut self.head);
+                self.head = old_value.unwrap().next;
+            } else {
+                LinkedList::recursive_delete(&mut self.head, value);
+            }
+        } else {
+            println!("Empty list");
         }
     }
 
-    pub fn delete(&mut self, value: T) {
-        todo!()    
+    fn recursive_delete(cursor: &mut Link<T>, value: T) {
+        if let Some(node) = cursor {
+            if let Some(next_node) = &mut node.next {
+                if next_node.value == value {
+                    let old_value = mem::take(&mut node.next);
+                    node.next = old_value.unwrap().next;
+                }
+                else if next_node.value < value {
+                    LinkedList::recursive_delete(&mut node.next, value);
+                }
+            }
+        }
     }
 
     #[allow(dead_code)]
@@ -111,6 +134,28 @@ mod tests {
         assert_eq!(list.head.as_ref().unwrap().value, 2); //head
         let ref_node = list.get_node_ref(&list.head, &10);
         assert_eq!(ref_node.as_ref().unwrap().value, 8); //tail
+    }
+
+    #[test]
+    fn delete_test() {
+        let mut list = LinkedList::new(8);
+        list.insert(2);
+        list.insert(7);
+        list.insert(3);
+        list.insert(5);
+        list.delete(2);
+        list.delete(5);
+        assert_eq!(list.head.as_ref().unwrap().value, 3);
+        let ref_node = list.get_node_ref(&list.head, &6);
+        assert_eq!(ref_node.as_ref().unwrap().value, 3);
+    }
+
+    #[test]
+    fn delete_one_item_test() {
+        let mut list = LinkedList::empty();
+        list.insert(324);
+        list.delete(324);
+        assert_eq!(list.head, None);
     }
 }
 
