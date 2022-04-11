@@ -38,7 +38,8 @@ fn run_random_linked_list() {
         list.insert(random);
     }
     println!("Fim--------------------");
-    list.display();
+    let v: Vec<f32> = list.collect();
+    println!("Ordered vector: {:?}", v);
 }
 
 fn run_odd_linked_list() {
@@ -52,9 +53,14 @@ fn run_odd_linked_list() {
         println!("Removing {}", j);
         list.delete(j);
     }
-    list.display();
+    let v: Vec<i32> = list.collect();
+    println!("Odd list: {:?}", v);
 }
 
 fn main() {
+    run_stack();
+    println!("\n");
+    run_random_linked_list();
+    println!("\n");
     run_odd_linked_list();
 }

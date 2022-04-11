@@ -105,6 +105,19 @@ impl<T> LinkedList<T> where T: Debug + PartialOrd + Debug {
     }
 }
 
+impl<T: Clone> Iterator for LinkedList<T> {
+    type Item = T;
+    fn next(&mut self) -> Option<Self::Item> {
+        match self.head.take() {
+            Some(node) => { 
+                self.head = node.next;
+                Some(node.value) 
+            }
+            None => None
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -156,6 +169,16 @@ mod tests {
         list.insert(324);
         list.delete(324);
         assert_eq!(list.head, None);
+    }
+
+    #[test]
+    fn iter_test() {
+        let mut list = LinkedList::empty();
+        for i in (0..20).rev() {
+            list.insert(i);
+        }
+        let v: Vec<i32> = list.collect();
+        println!("List to vector: {:?}", v);
     }
 }
 
