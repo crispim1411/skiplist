@@ -3,7 +3,7 @@ SkipList é uma estrutura descrita em 1989 por William Pugh que se baseia em bal
 
 ## Plano de desenvolvimento
 1. Stack: Entender o processo de substituição de um item por outro na cabeça da pilha ([link](https://github.com/crispim1411/skiplist/blob/master/src/stack.rs))
-3. Linked List: Inserir um item entre outros dois itens da lista
+3. Linked List: Inserir um item entre outros dois itens da lista ([link](https://github.com/crispim1411/skiplist/blob/master/src/linked_list.rs))
 4. SkipList: Em cada nível inserir entre dois itens um novo item
 
 ## Complexidade temporal
@@ -39,13 +39,34 @@ Manter uma estrutura onde o nível acima é sempre a metade do nível anterior �
 
 ![image](https://user-images.githubusercontent.com/29204714/162480390-97915e50-8ef5-49be-b133-d31f2dc766ed.png)
 
-## Considerações da implementação
-- Manter referência quando abrir um Option
+# Implementação
+## Stack
+- Inserir na pilha
 ```rust
-node: Option<Box<Node<T>>>
-node.as_ref().unwrap(): &Box<Node<T>>
+pub fn push(&mut self, value: T) {
+    let old_head = self.head.take();
+    let new_head = Item {
+        value,
+        next: old_head,
+    };
+    self.head = Some(Box::new(new_head));
+}
+```
+- Remover da pilha 
+```rust
+pub fn pop(&mut self) -> Option<T> {
+        let old_head = self.head.take();
+        match old_head {
+            Some(item) => {
+                self.head = item.next;
+                Some(item.value)
+            }
+            None => None,
+        }
+    }
 ```
 
+## Linked List
 - Pesquisa recursiva retornando referência de nó
 ```rust
 fn get_node_ref<'a>(&self, cursor: &'a Link<T>, key: &T) -> &'a Link<T> {
@@ -60,7 +81,7 @@ fn get_node_ref<'a>(&self, cursor: &'a Link<T>, key: &T) -> &'a Link<T> {
 }
 ```
 
-- Inserir um novo nó
+- Inserir um novo nó recursivamente
 ```rust
 fn recursive_insert(cursor: &mut Link<T>, value: T) {
     if let Some(node) = cursor {
@@ -73,6 +94,23 @@ fn recursive_insert(cursor: &mut Link<T>, value: T) {
         let old_value = mem::take(&mut node.next);
         new_node.next = old_value;
         node.next = Some(Box::new(new_node));
+    }
+}
+```
+
+- Remover um nó recursivamente
+```rust
+fn recursive_delete(cursor: &mut Link<T>, value: T) {
+    if let Some(node) = cursor {
+        if let Some(next_node) = &mut node.next {
+            if next_node.value == value {
+                let old_value = mem::take(&mut node.next);
+                node.next = old_value.unwrap().next;
+            }
+            else if next_node.value < value {
+                LinkedList::recursive_delete(&mut node.next, value);
+            }
+        }
     }
 }
 ```
