@@ -43,6 +43,7 @@ fn run_random_linked_list() {
     println!("Ordered vector: {:?}", v);
 }
 
+#[allow(dead_code)]
 fn run_odd_linked_list() {
     let last = 20;
     println!("*Inserindo números de 0 a {}*", last);
