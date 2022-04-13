@@ -1,5 +1,6 @@
 use rand::Rng;
 use skiplist::stack::Stack;
+use skiplist::skiplist::SkipList;
 use skiplist::linked_list::LinkedList;
 
 #[allow(dead_code)]
@@ -57,10 +58,20 @@ fn run_odd_linked_list() {
     println!("Odd list: {:?}", v);
 }
 
+fn run_skiplist() {
+    let mut skiplist: SkipList<u32> = SkipList::new();
+    println!("SL: {:?}", skiplist);
+    skiplist.insert(5);
+    skiplist.insert(3);
+
+    skiplist.display();
+}
+
 fn main() {
-    run_stack();
-    println!("\n");
-    run_random_linked_list();
-    println!("\n");
-    run_odd_linked_list();
+    // run_stack();
+    // println!("\n");
+    // run_random_linked_list();
+    // println!("\n");
+    // run_odd_linked_list();
+    run_skiplist();
 }
