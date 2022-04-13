@@ -45,7 +45,6 @@ impl<T: Default + Debug + PartialOrd + Clone> SkipList<T> {
     }
 
     fn recursive_insert(&self, cursor: &Link<T>, value: T, level: usize) {
-        println!("\ncursor: {:?}", cursor);
         if let Some(node) = cursor {
             println!("node: {:?}", node.borrow().value);
             if let Some(next_node) = node.borrow().forward[level].as_ref() {
