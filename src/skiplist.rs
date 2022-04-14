@@ -43,29 +43,33 @@ impl<T: Default + Debug + PartialOrd + Clone> SkipList<T> {
     }
 
     pub fn insert(&mut self, value: T, random_level: usize) {
+        // TODO: Condição do level ser maior que self.level
         println!("##Inserting {:?}", value);
-        for level in 0..random_level {
-            println!("--Leve: {}--", level);
-            self.recursive_insert(&self.head[self.level-1], value.clone(), level);
+        for level in (0..random_level).rev() {
+            println!("--Level: {}--", level);
+            self.recursive_insert(&self.head[level], value.clone(), level, random_level);
+            println!("End level: {} - cursor: {:#?}", level, &self.head[level]);
         }
     }
 
-    fn recursive_insert(&self, cursor: &Link<T>, value: T, level: usize) {
+    fn recursive_insert(&self, cursor: &Link<T>, value: T, level: usize, random_level: usize) {
+        println!("cursor: {:#?}", cursor);
         if let Some(node) = cursor {
             if let Some(next_node) = node.borrow().forward[level].as_ref() {
                 if next_node.borrow().value < value {
-                    return self.recursive_insert(&node.borrow().forward[level], value, level);
+                    return self.recursive_insert(&node.borrow().forward[level], value, level, random_level);
                 }
             }
             let mut old_value = node.take();
-            println!("node: {:?}", old_value);
-            let update_ref = old_value.forward;
+            println!("node: {:#?}", old_value);
+            let mut update_ref = old_value.forward;
 
-            let new_node = Node{ value, forward: update_ref};
-            let ref_new = 
-                Rc::new(RefCell::new(new_node));
+            let mut new_node = Node { value, forward: vec![None; random_level]};
+            new_node.forward[level] = update_ref[level].take();
 
-            old_value.forward = vec![Some(Rc::clone(&ref_new)); 1];
+            let ref_new = Rc::new(RefCell::new(new_node));
+            update_ref[level] = Some(ref_new);
+            old_value.forward = update_ref;
 
             *node.borrow_mut() = old_value;
         }   

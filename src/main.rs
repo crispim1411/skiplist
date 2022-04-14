@@ -61,11 +61,11 @@ fn run_odd_linked_list() {
 
 fn run_skiplist() {
     let mut skiplist: SkipList<u32> = SkipList::new();
-    println!("SL: {:?}", skiplist);
+    println!("SL: {:#?}", skiplist);
     skiplist.display();
-    skiplist.insert(5);
+    skiplist.insert(5, 1);
     skiplist.display();
-    skiplist.insert(3);
+    skiplist.insert(3, 1);
     skiplist.display();
 }
 
