@@ -53,11 +53,21 @@ impl<T: Default + Debug + PartialOrd + Clone> SkipList<T> {
                 self.head[level] = Some(Rc::clone(&ref_new));
             }   
         }
+        else if self.head[0].as_ref().unwrap().borrow().value > value {
+            let mut new_node = Node { 
+                value, 
+                forward: vec![None; random_level+1]
+            };
+            new_node.forward = self.head[0..=random_level].to_vec();
+
+            let ref_new = Rc::new(RefCell::new(new_node));
+            for level in 0..=random_level {
+                self.head[level] = Some(Rc::clone(&ref_new));
+            }
+        }
         else {
             for level in (0..=random_level).rev() {
-                println!("--Level: {}--", level);
                 self.recursive_insert(&self.head[level], value.clone(), level, random_level);
-                println!("End level: {} - cursor: {:?}", level, &self.head[level]);
             }
         }
 
@@ -67,7 +77,6 @@ impl<T: Default + Debug + PartialOrd + Clone> SkipList<T> {
     }
 
     fn recursive_insert(&self, cursor: &Link<T>, value: T, level: usize, random_level: usize) {
-        println!("cursor: {:#?}", cursor);
         if let Some(node) = cursor {
             if let Some(next_node) = node.borrow().forward[level].as_ref() {
                 if next_node.borrow().value < value {
@@ -75,7 +84,6 @@ impl<T: Default + Debug + PartialOrd + Clone> SkipList<T> {
                 }
             }
             let mut old_value = node.take();
-            println!("node: {:#?}", old_value);
             let mut update_ref = old_value.forward;
 
             let mut new_node = Node { value, forward: vec![None; random_level+1]};
