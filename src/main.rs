@@ -63,8 +63,8 @@ fn run_skiplist() {
     let mut skiplist: SkipList<u32> = SkipList::new();
     skiplist.display();
     skiplist.insert(5, 1);
-    skiplist.insert(10, 1);
-    skiplist.insert(8, 0);
+    skiplist.insert(10, 0);
+    skiplist.insert(8, 1);
     skiplist.insert(7, 1);
     skiplist.insert(6, 0);
     skiplist.display();
@@ -72,6 +72,7 @@ fn run_skiplist() {
     skiplist.insert(4, 1);
     skiplist.insert(3, 0);
     skiplist.insert(2, 1);
+    skiplist.insert(9, 1 );
     skiplist.display();
 }
 
