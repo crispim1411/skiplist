@@ -44,13 +44,11 @@ impl<T: Default + Debug + PartialOrd + Clone> SkipList<T> {
     }
 
     pub fn insert(&mut self, value: T, random_level: usize) {
-        println!("##Inserting {:?}", value);
         if self.head[0].is_none() {
-            let new_node = Node { value, forward: vec![None; random_level]};
+            let new_node = Node { value, forward: vec![None; random_level+1]};
             let ref_new = Rc::new(RefCell::new(new_node));
-            for level in 0..random_level {
+            for level in 0..=random_level {
                 self.head[level] = Some(Rc::clone(&ref_new));
-                println!("Inserting {:?} at level {}", ref_new.borrow().value, level);
             }   
         }
         else {
@@ -61,7 +59,6 @@ impl<T: Default + Debug + PartialOrd + Clone> SkipList<T> {
             }
         }
 
-        // TODO: Condição do level ser maior que self.level
         if random_level > self.level {
             self.level = random_level
         }
