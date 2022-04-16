@@ -29,17 +29,19 @@ impl<T: Default + Debug + PartialOrd + Clone> SkipList<T> {
             println!("Skiplist is empty.");
             return
         }
+        self.recursive_display(self.head[MAX_LEVEL-1].as_ref(), MAX_LEVEL-1);
+        println!("\n");
+    }
 
-        for level in (0..MAX_LEVEL).rev() {
-            let mut cursor = self.head[level].clone();
-            while let Some(node) = cursor {
-                print!("[{:?}] -> ", node.borrow().value);
-                if node.borrow().forward[level].is_none() {
-                    break;
-                }
-                cursor = node.borrow().forward[level].clone();
-            }
+    fn recursive_display(&self, cursor: Option<&Rc<RefCell<Node<T>>>>, mut level: usize) {
+        if let Some(node) = cursor {
+            print!("[{:?}({})] -> ", node.borrow().value, Rc::strong_count(&node));
+            return self.recursive_display(node.borrow().forward[level].as_ref(), level);
+        }
+        if level != 0 {
+            level -= 1;
             println!();
+            self.recursive_display(self.head[level].as_ref(), level);
         }
     }
 
