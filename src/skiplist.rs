@@ -25,6 +25,11 @@ impl<T: Default + Debug + PartialOrd + Clone> SkipList<T> {
     }
 
     pub fn display(&self) {
+        if self.head[0].is_none() {
+            println!("Skiplist is empty.");
+            return
+        }
+
         for level in (0..MAX_LEVEL).rev() {
             let mut cursor = self.head[level].clone();
             while let Some(node) = cursor {
@@ -39,12 +44,26 @@ impl<T: Default + Debug + PartialOrd + Clone> SkipList<T> {
     }
 
     pub fn insert(&mut self, value: T, random_level: usize) {
-        // TODO: Condição do level ser maior que self.level
         println!("##Inserting {:?}", value);
-        for level in (0..random_level).rev() {
-            println!("--Level: {}--", level);
-            self.recursive_insert(&self.head[level], value.clone(), level, random_level);
-            println!("End level: {} - cursor: {:#?}", level, &self.head[level]);
+        if self.head[0].is_none() {
+            let new_node = Node { value, forward: vec![None; random_level]};
+            let ref_new = Rc::new(RefCell::new(new_node));
+            for level in 0..random_level {
+                self.head[level] = Some(Rc::clone(&ref_new));
+                println!("Inserting {:?} at level {}", ref_new.borrow().value, level);
+            }   
+        }
+        else {
+            for level in (0..random_level).rev() {
+                println!("--Level: {}--", level);
+                self.recursive_insert(&self.head[level], value.clone(), level, random_level);
+                println!("End level: {} - cursor: {:?}", level, &self.head[level]);
+            }
+        }
+
+        // TODO: Condição do level ser maior que self.level
+        if random_level > self.level {
+            self.level = random_level
         }
     }
 
