@@ -64,7 +64,9 @@ fn run_skiplist() {
     skiplist.display();
     skiplist.insert(5, 1);
     skiplist.display();
-    skiplist.insert(3, 1);
+    skiplist.insert(8, 1);
+    skiplist.insert(7, 1);
+    skiplist.insert(6, 1);
     skiplist.display();
 }
 

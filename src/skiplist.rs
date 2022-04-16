@@ -52,7 +52,7 @@ impl<T: Default + Debug + PartialOrd + Clone> SkipList<T> {
             }   
         }
         else {
-            for level in (0..random_level).rev() {
+            for level in (0..=random_level).rev() {
                 println!("--Level: {}--", level);
                 self.recursive_insert(&self.head[level], value.clone(), level, random_level);
                 println!("End level: {} - cursor: {:?}", level, &self.head[level]);
@@ -76,7 +76,7 @@ impl<T: Default + Debug + PartialOrd + Clone> SkipList<T> {
             println!("node: {:#?}", old_value);
             let mut update_ref = old_value.forward;
 
-            let mut new_node = Node { value, forward: vec![None; random_level]};
+            let mut new_node = Node { value, forward: vec![None; random_level+1]};
             new_node.forward[level] = update_ref[level].take();
 
             let ref_new = Rc::new(RefCell::new(new_node));
