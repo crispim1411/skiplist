@@ -17,16 +17,12 @@ pub struct SkipList<T> {
 }
 
 impl<T: Default + Debug + PartialOrd + Clone> SkipList<T> {
-    // pub fn new() -> Self {
-    //     let head: Node<T> = Node { 
-    //         value: Default::default(), 
-    //         forward: vec![None; MAX_LEVEL] 
-    //     };
-    //     Self { 
-    //         head: Some(Rc::new(RefCell::new(head))), 
-    //         level: 0 
-    //     }
-    // }
+    pub fn new() -> Self {
+        Self { 
+            head: vec![None; MAX_LEVEL], 
+            level: 0 
+        }
+    }
 
     pub fn display(&self) {
         for level in (0..MAX_LEVEL).rev() {
@@ -75,49 +71,3 @@ impl<T: Default + Debug + PartialOrd + Clone> SkipList<T> {
         }   
     }
 } 
-
-impl SkipList<u32> {
-    pub fn new() -> Self {
-        let mut head = vec![None; MAX_LEVEL];
-
-        // node2
-        let random_level2 = 2;
-        let node2 = Node {
-            value: 7,
-            forward: vec![None; random_level2]
-        };
-        let rc_node2 = Rc::new(RefCell::new(node2));
-        // for level in 0..random_level2 {
-        //     if head[level].is_none() {
-        //         println!("inserting {:?} on head[{}]: {:?}",rc_node2, level, head[level]);
-        //         head[level] = Some(Rc::clone(&rc_node2));
-        //     }
-        // }
-        
-        // node1
-        let random_level = 2;
-        let mut node1 = Node {
-            value: 2,
-            forward: vec![None; random_level]
-        };
-        for level in 0..random_level2 {
-            println!("inserting {:?} on node[{}]: {:?}",rc_node2.borrow().value, level, node1.forward[random_level2 - 1] );
-            node1.forward[level]  = Some(Rc::clone(&rc_node2));
-        }
-       // node1.forward[random_level2 - 1] = Some(Rc::clone(&rc_node2));
-        let rc_node1 = Rc::new(RefCell::new(node1));
-        for level in 0..random_level {
-            println!("inserting {:?} on head[{}]: {:?}",rc_node1.borrow().value, level, head[level]);
-            head[level] = Some(Rc::clone(&rc_node1));
-        }
-        println!("node inserted: {:?}", rc_node1);
-
-        
-        
-        Self { 
-            head, 
-            level: 1
-        }
-    }
-
-}
