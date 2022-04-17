@@ -53,9 +53,11 @@ impl<T: Default + Debug + PartialOrd + Clone + Add<Output = T>> SkipList<T> {
             forward: vec![None; random_level+1]
         }));
 
-        if self.head[0].is_none() {
+        if self.head[random_level].is_none() {
             for level in 0..=random_level {
-                self.head[level] = Some(Rc::clone(&new_node));
+                if self.head[level].is_none() {
+                    self.head[level] = Some(Rc::clone(&new_node));
+                }
             }   
         }
         else if self.head[0].as_ref().unwrap().borrow().value > value {
@@ -68,7 +70,7 @@ impl<T: Default + Debug + PartialOrd + Clone + Add<Output = T>> SkipList<T> {
             }
         }
         else {
-            let cursor = &self.head[random_level].as_ref().unwrap();
+            let cursor = self.head[random_level].as_ref().unwrap();
             self.recursive_insert(cursor, &new_node, random_level);
         }
 
