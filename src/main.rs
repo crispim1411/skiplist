@@ -61,18 +61,14 @@ fn run_odd_linked_list() {
 
 fn run_skiplist() {
     let mut skiplist: SkipList<u32> = SkipList::new();
-    skiplist.display();
-    skiplist.insert(5, 1);
-    skiplist.insert(10, 0);
-    skiplist.insert(8, 1);
-    skiplist.insert(7, 1);
-    skiplist.insert(6, 0);
-    skiplist.display();
-    println!("new head");
-    skiplist.insert(4, 1);
-    skiplist.insert(3, 0);
-    skiplist.insert(2, 1);
-    skiplist.insert(9, 1 );
+    
+    let mut rng = rand::thread_rng();
+    for i in (1..20).step_by(3).rev() {
+        // let random: u32 = rng.gen_range(0..20);
+        skiplist.insert(i);
+        skiplist.display();
+    }   
+    skiplist.insert2(0);
     skiplist.display();
 }
 
