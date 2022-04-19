@@ -2,7 +2,7 @@ use std::{rc::Rc, cell::RefCell};
 use std::fmt::Debug;
 use rand::Rng;
 
-const MAX_LEVEL: usize = 2;
+const MAX_LEVEL: usize = 1;
 
 #[derive(Default, Debug)]
 struct Node<T> {
@@ -61,7 +61,7 @@ impl<T: Default + Debug + PartialOrd + Clone> SkipList<T> {
         if let Some(node) = &update[0] {
             if let Some(next_node) = node.borrow().forward[0].as_ref() {
                 if next_node.borrow().key == key {
-                    println!("Item {:?} já cadastrado", key);
+                    println!("Item {:?} - update not implemented", key);
                     return
                 }
             }
@@ -107,3 +107,22 @@ impl<T: Default + Debug + PartialOrd + Clone> SkipList<T> {
         update
     }
 } 
+
+#[cfg(test)] 
+mod tests {
+    use super::*;
+    #[test]
+    fn is_empty_test() {
+        let sl: SkipList<i16> = SkipList::new();
+        assert_eq!(sl.head.borrow().forward[0].is_none(), true);
+    }
+
+    #[test]
+    fn reverse_insert_test() {
+        let mut sl = SkipList::new();
+        for i in (0..20).rev() {
+            sl.insert(i);
+        }
+        sl.display();
+    }
+}
