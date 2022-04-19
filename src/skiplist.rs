@@ -39,16 +39,17 @@ impl<T: Default + Debug + PartialOrd + Clone> SkipList<T> {
             return
         }
         self.recursive_display(&self.head.as_ref().unwrap(), self.level);
+        println!();
     }
 
     fn recursive_display(&self, cursor: &Rc<RefCell<Node<T>>>, level: usize) {
         if let Some(node) = cursor.borrow().forward[level].as_ref() {
-            print!("[{:?}({}) lvl{}] -> ", node.borrow().value, Rc::strong_count(&node), level);
+            print!("[{:?}({})] -> ", node.borrow().value, Rc::strong_count(&node));
             return self.recursive_display(&node, level);
         }
         println!();
         if level != 0 {
-            self.recursive_display(&self.head.as_ref().unwrap(), level-1);
+            return self.recursive_display(&self.head.as_ref().unwrap(), level-1);
         }
     }
 
@@ -60,13 +61,12 @@ impl<T: Default + Debug + PartialOrd + Clone> SkipList<T> {
         if let Some(node) = &update[0] {
             if let Some(next_node) = node.borrow().forward[0].as_ref() {
                 if next_node.borrow().value == value {
-                    println!("Item já cadastrado");
+                    println!("Item {:?} já cadastrado", value);
                     return
                 }
             }
         }
 
-        println!("Inserting {:?} at level {}", value, random_level);
         let new_node = Rc::new(RefCell::new(Node { 
             value: value, 
             forward: vec![None; random_level+1]
