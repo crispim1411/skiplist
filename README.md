@@ -4,7 +4,7 @@ SkipList é uma estrutura descrita em 1989 por William Pugh que se baseia em bal
 ## Plano de desenvolvimento
 1. Stack: Entender o processo de substituição de um item por outro na cabeça da pilha ([link](https://github.com/crispim1411/skiplist/blob/master/src/stack.rs))
 3. Linked List: Inserir um item entre outros dois itens da lista ([link](https://github.com/crispim1411/skiplist/blob/master/src/linked_list.rs))
-4. SkipList: Em cada nível inserir entre dois itens um novo item
+4. SkipList: Em cada nível inserir entre dois itens um novo item ([link](https://github.com/crispim1411/skiplist/blob/master/src/skiplist.rs))
 
 ## Complexidade temporal
 ### Um nível
@@ -122,5 +122,60 @@ fn recursive_delete(cursor: &mut Link<T>, value: T) {
             }
         }
     }
+}
+```
+## SkipList
+- Inserção
+```rust
+pub fn insert(&mut self, value: T) {
+    let random_level = self.random_level();
+
+    let update = self.fill_update_vector(&self.head.as_ref().unwrap(), vec![None; random_level+1], &value, random_level);
+
+    if let Some(node) = &update[0] {
+        if let Some(next_node) = node.borrow().forward[0].as_ref() {
+            if next_node.borrow().value == value {
+                println!("Item {:?} já cadastrado", value);
+                return
+            }
+        }
+    }
+
+    let new_node = Rc::new(RefCell::new(Node { 
+        value: value, 
+        forward: vec![None; random_level+1]
+    }));
+
+    for level in 0..=random_level {
+        let node = update[level].as_ref().unwrap();
+
+        let mut new_node_inner = new_node.take();
+        let mut node_inner = node.take();
+
+        new_node_inner.forward[level] = node_inner.forward[level].take();
+        new_node.replace(new_node_inner);
+
+        node_inner.forward[level] = Some(Rc::clone(&new_node));
+        node.replace(node_inner);
+    }
+
+    if random_level > self.level {
+        self.level = random_level
+    }
+}
+
+fn fill_update_vector(&self, cursor: &Rc<RefCell<Node<T>>>, mut update: Vec<Link<T>>, value: &T, level: usize) -> Vec<Link<T>> {
+    if let Some(node) = &cursor.borrow().forward[level] {
+        if node.borrow().value < *value {
+            return self.fill_update_vector(node, update, value, level);
+        }
+    }
+
+    update[level] = Some(Rc::clone(cursor));
+
+    if level > 0 {
+        return self.fill_update_vector(cursor, update, value, level-1);
+    }
+    update
 }
 ```
