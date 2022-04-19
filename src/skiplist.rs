@@ -5,19 +5,24 @@ use rand::Rng;
 const MAX_LEVEL: usize = 1;
 
 #[derive(Default, Debug)]
-struct Node<T> {
+struct Node<T,U> {
     key: T,
-    forward: Vec<Option<Link<T>>>,
+    value: U,
+    forward: Vec<Option<Link<T,U>>>,
 }
-type Link<T> = Rc<RefCell<Node<T>>>;
+type Link<T,U> = Rc<RefCell<Node<T,U>>>;
 
 #[derive(Debug)]
-pub struct SkipList<T> {
-    head: Link<T>, 
+pub struct SkipList<T,U> {
+    head: Link<T,U>, 
     level: usize,
 }
 
-impl<T: Default + Debug + PartialOrd + Clone> SkipList<T> {
+impl<T, U> SkipList<T,U> 
+where 
+    T: Default + Debug + PartialOrd,
+    U: Default + Debug
+{
     pub fn new() -> Self {
         let mut head = Node::default();
         head.forward = vec![None; MAX_LEVEL+1];
@@ -42,9 +47,9 @@ impl<T: Default + Debug + PartialOrd + Clone> SkipList<T> {
         println!();
     }
 
-    fn recursive_display(&self, cursor: &Link<T>, level: usize) {
+    fn recursive_display(&self, cursor: &Link<T,U>, level: usize) {
         if let Some(node) = cursor.borrow().forward[level].as_ref() {
-            print!("[{:?}({})] -> ", node.borrow().key, Rc::strong_count(&node));
+            print!("[{:?}] -> ", node.borrow().key);
             return self.recursive_display(&node, level);
         }
         println!();
@@ -53,7 +58,7 @@ impl<T: Default + Debug + PartialOrd + Clone> SkipList<T> {
         }
     }
 
-    pub fn insert(&mut self, key: T) {
+    pub fn insert(&mut self, key: T, value: U) {
         let random_level = self.random_level();
         
         let update = self.fill_update_vector(&self.head, vec![None; random_level+1], &key, random_level);
@@ -70,6 +75,7 @@ impl<T: Default + Debug + PartialOrd + Clone> SkipList<T> {
         let new_node = Rc::new(RefCell::new(
             Node { 
                 key, 
+                value,
                 forward: vec![None; random_level+1]
             }
         ));
@@ -92,7 +98,7 @@ impl<T: Default + Debug + PartialOrd + Clone> SkipList<T> {
         }
     }
 
-    fn fill_update_vector(&self, cursor: &Link<T>, mut update: Vec<Option<Link<T>>>, key: &T, level: usize) -> Vec<Option<Link<T>>> {
+    fn fill_update_vector(&self, cursor: &Link<T,U>, mut update: Vec<Option<Link<T,U>>>, key: &T, level: usize) -> Vec<Option<Link<T,U>>> {
         if let Some(node) = &cursor.borrow().forward[level] {
             if node.borrow().key < *key {
                 return self.fill_update_vector(node, update, key, level);
@@ -113,7 +119,7 @@ mod tests {
     use super::*;
     #[test]
     fn is_empty_test() {
-        let sl: SkipList<i16> = SkipList::new();
+        let sl: SkipList<i16, u32> = SkipList::new();
         assert_eq!(sl.head.borrow().forward[0].is_none(), true);
     }
 
@@ -121,7 +127,7 @@ mod tests {
     fn reverse_insert_test() {
         let mut sl = SkipList::new();
         for i in (0..20).rev() {
-            sl.insert(i);
+            sl.insert(i, i*i);
         }
         sl.display();
     }
