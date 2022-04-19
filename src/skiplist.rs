@@ -21,7 +21,7 @@ pub struct SkipList<T,U> {
 impl<T, U> SkipList<T,U> 
 where 
     T: Default + Debug + PartialOrd,
-    U: Default + Debug
+    U: Default + Debug + Clone
 {
     pub fn new() -> Self {
         let mut head = Node::default();
@@ -111,6 +111,30 @@ where
             return self.fill_update_vector(cursor, update, key, level-1);
         }
         update
+    }
+
+    pub fn search(&self, key: T) -> Option<U> {
+        if self.head.borrow().forward[0].is_none() {
+            println!("Skiplist is empty.");
+            return None;
+        }
+        return self.recursive_search(&self.head, key, self.level);
+    }
+
+    fn recursive_search(&self, cursor: &Link<T,U>, key: T, level: usize) -> Option<U> {
+        if let Some(node) = cursor.borrow().forward[level].as_ref() {
+            println!("cursor: {:?}", node.borrow().key);
+            if node.borrow().key < key {
+                return self.recursive_search(&node, key, level);
+            }
+            if node.borrow().key == key {
+                return Some(node.borrow().value.clone())
+            }
+        }
+        if level != 0 {
+            return self.recursive_search(cursor, key, level-1);
+        }
+        None
     }
 } 
 

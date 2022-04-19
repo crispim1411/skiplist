@@ -71,7 +71,7 @@ fn run_skiplist() {
 }
 
 fn run_str_skiplist(){
-    #[derive(Debug, Default)]
+    #[derive(Debug, Default, Clone)]
     struct StudentInfo {
         name: String,
         mat: String,
@@ -115,6 +115,12 @@ fn run_str_skiplist(){
     skiplist.insert(std3.mat.clone(), std3);
     skiplist.insert(std4.mat.clone(), std4);
     skiplist.display();
+    if let Some(content) = skiplist.search("1560020".to_string()) {
+        println!("{:?}\n", content);
+    } 
+    else {
+        println!("Usuário não encontrado")
+    }
 }
 
 fn main() {
