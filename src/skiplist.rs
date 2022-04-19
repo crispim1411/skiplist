@@ -2,18 +2,18 @@ use std::{rc::Rc, cell::RefCell};
 use std::fmt::Debug;
 use rand::Rng;
 
-const MAX_LEVEL: usize = 1;
+const MAX_LEVEL: usize = 2;
 
 #[derive(Default, Debug)]
 struct Node<T> {
     value: T,
-    forward: Vec<Link<T>>,
+    forward: Vec<Option<Link<T>>>,
 }
-type Link<T> = Option<Rc<RefCell<Node<T>>>>;
+type Link<T> = Rc<RefCell<Node<T>>>;
 
 #[derive(Debug)]
 pub struct SkipList<T> {
-    head: Rc<RefCell<Node<T>>>, 
+    head: Link<T>, 
     level: usize,
 }
 
@@ -42,7 +42,7 @@ impl<T: Default + Debug + PartialOrd + Clone> SkipList<T> {
         println!();
     }
 
-    fn recursive_display(&self, cursor: &Rc<RefCell<Node<T>>>, level: usize) {
+    fn recursive_display(&self, cursor: &Link<T>, level: usize) {
         if let Some(node) = cursor.borrow().forward[level].as_ref() {
             print!("[{:?}({})] -> ", node.borrow().value, Rc::strong_count(&node));
             return self.recursive_display(&node, level);
@@ -90,7 +90,7 @@ impl<T: Default + Debug + PartialOrd + Clone> SkipList<T> {
         }
     }
 
-    fn fill_update_vector(&self, cursor: &Rc<RefCell<Node<T>>>, mut update: Vec<Link<T>>, value: &T, level: usize) -> Vec<Link<T>> {
+    fn fill_update_vector(&self, cursor: &Link<T>, mut update: Vec<Option<Link<T>>>, value: &T, level: usize) -> Vec<Option<Link<T>>> {
         if let Some(node) = &cursor.borrow().forward[level] {
             if node.borrow().value < *value {
                 return self.fill_update_vector(node, update, value, level);
