@@ -34,7 +34,7 @@ impl<T: Default + Debug + PartialOrd + Clone> SkipList<T> {
     }
 
     pub fn display(&self) {
-        if self.level == 0 {
+        if self.head.as_ref().unwrap().borrow().forward[0].is_none() {
             println!("Skiplist is empty.");
             return
         }
@@ -48,7 +48,7 @@ impl<T: Default + Debug + PartialOrd + Clone> SkipList<T> {
         }
         println!();
         if level != 0 {
-            self.recursive_display(cursor, level-1);
+            self.recursive_display(&self.head.as_ref().unwrap(), level-1);
         }
     }
 
