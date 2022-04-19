@@ -13,7 +13,7 @@ type Link<T> = Option<Rc<RefCell<Node<T>>>>;
 
 #[derive(Debug)]
 pub struct SkipList<T> {
-    head: Link<T>, 
+    head: Rc<RefCell<Node<T>>>, 
     level: usize,
 }
 
@@ -21,7 +21,7 @@ impl<T: Default + Debug + PartialOrd + Clone> SkipList<T> {
     pub fn new() -> Self {
         let mut head = Node::default();
         head.forward = vec![None; MAX_LEVEL+1];
-        Self { head: Some(Rc::new(RefCell::new(head))), level: 0 }
+        Self { head: Rc::new(RefCell::new(head)), level: 0 }
     }
 
     fn random_level(&self) -> usize{
@@ -34,11 +34,11 @@ impl<T: Default + Debug + PartialOrd + Clone> SkipList<T> {
     }
 
     pub fn display(&self) {
-        if self.head.as_ref().unwrap().borrow().forward[0].is_none() {
+        if self.head.borrow().forward[0].is_none() {
             println!("Skiplist is empty.");
             return
         }
-        self.recursive_display(&self.head.as_ref().unwrap(), self.level);
+        self.recursive_display(&self.head, self.level);
         println!();
     }
 
@@ -49,14 +49,14 @@ impl<T: Default + Debug + PartialOrd + Clone> SkipList<T> {
         }
         println!();
         if level != 0 {
-            return self.recursive_display(&self.head.as_ref().unwrap(), level-1);
+            return self.recursive_display(&self.head, level-1);
         }
     }
 
     pub fn insert(&mut self, value: T) {
         let random_level = self.random_level();
         
-        let update = self.fill_update_vector(&self.head.as_ref().unwrap(), vec![None; random_level+1], &value, random_level);
+        let update = self.fill_update_vector(&self.head, vec![None; random_level+1], &value, random_level);
 
         if let Some(node) = &update[0] {
             if let Some(next_node) = node.borrow().forward[0].as_ref() {
