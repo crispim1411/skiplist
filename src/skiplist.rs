@@ -6,7 +6,7 @@ const MAX_LEVEL: usize = 2;
 
 #[derive(Default, Debug)]
 struct Node<T> {
-    value: T,
+    key: T,
     forward: Vec<Option<Link<T>>>,
 }
 type Link<T> = Rc<RefCell<Node<T>>>;
@@ -44,7 +44,7 @@ impl<T: Default + Debug + PartialOrd + Clone> SkipList<T> {
 
     fn recursive_display(&self, cursor: &Link<T>, level: usize) {
         if let Some(node) = cursor.borrow().forward[level].as_ref() {
-            print!("[{:?}({})] -> ", node.borrow().value, Rc::strong_count(&node));
+            print!("[{:?}({})] -> ", node.borrow().key, Rc::strong_count(&node));
             return self.recursive_display(&node, level);
         }
         println!();
@@ -53,24 +53,26 @@ impl<T: Default + Debug + PartialOrd + Clone> SkipList<T> {
         }
     }
 
-    pub fn insert(&mut self, value: T) {
+    pub fn insert(&mut self, key: T) {
         let random_level = self.random_level();
         
-        let update = self.fill_update_vector(&self.head, vec![None; random_level+1], &value, random_level);
+        let update = self.fill_update_vector(&self.head, vec![None; random_level+1], &key, random_level);
 
         if let Some(node) = &update[0] {
             if let Some(next_node) = node.borrow().forward[0].as_ref() {
-                if next_node.borrow().value == value {
-                    println!("Item {:?} já cadastrado", value);
+                if next_node.borrow().key == key {
+                    println!("Item {:?} já cadastrado", key);
                     return
                 }
             }
         }
 
-        let new_node = Rc::new(RefCell::new(Node { 
-            value: value, 
-            forward: vec![None; random_level+1]
-        }));
+        let new_node = Rc::new(RefCell::new(
+            Node { 
+                key, 
+                forward: vec![None; random_level+1]
+            }
+        ));
         
         for level in 0..=random_level {
             let node = update[level].as_ref().unwrap();
@@ -90,17 +92,17 @@ impl<T: Default + Debug + PartialOrd + Clone> SkipList<T> {
         }
     }
 
-    fn fill_update_vector(&self, cursor: &Link<T>, mut update: Vec<Option<Link<T>>>, value: &T, level: usize) -> Vec<Option<Link<T>>> {
+    fn fill_update_vector(&self, cursor: &Link<T>, mut update: Vec<Option<Link<T>>>, key: &T, level: usize) -> Vec<Option<Link<T>>> {
         if let Some(node) = &cursor.borrow().forward[level] {
-            if node.borrow().value < *value {
-                return self.fill_update_vector(node, update, value, level);
+            if node.borrow().key < *key {
+                return self.fill_update_vector(node, update, key, level);
             }
         }
         
         update[level] = Some(Rc::clone(cursor));
 
         if level > 0 {
-            return self.fill_update_vector(cursor, update, value, level-1);
+            return self.fill_update_vector(cursor, update, key, level-1);
         }
         update
     }
