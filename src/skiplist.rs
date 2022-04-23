@@ -65,7 +65,7 @@ where
         if let Some(node) = &update[0] {
             if let Some(next_node) = node.borrow().forward[0].as_ref() {
                 if next_node.borrow().key == key {
-                    println!("Item {:?} - update not implemented", key);
+                    println!("Item {:?} already inserted", key);
                     return
                 }
             }
