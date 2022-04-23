@@ -4,7 +4,7 @@ use rand::Rng;
 
 const MAX_LEVEL: usize = 1;
 
-#[derive(Default, Debug)]
+#[derive(Default)]
 struct Node<T,U> {
     key: T,
     value: U,
@@ -12,7 +12,6 @@ struct Node<T,U> {
 }
 type Link<T,U> = Rc<RefCell<Node<T,U>>>;
 
-#[derive(Debug)]
 pub struct SkipList<T,U> {
     head: Link<T,U>, 
     level: usize,
@@ -92,19 +91,24 @@ where
             node_inner.forward[level] = Some(Rc::clone(&new_node));
             node.replace(node_inner);
         }
-        
+
         if random_level > self.level {
             self.level = random_level
         }
     }
 
-    fn fill_update_vector(&self, cursor: &Link<T,U>, mut update: Vec<Option<Link<T,U>>>, key: &T, level: usize) -> Vec<Option<Link<T,U>>> {
+    fn fill_update_vector(&self, 
+        cursor: &Link<T,U>, 
+        mut update: Vec<Option<Link<T,U>>>, 
+        key: &T, 
+        level: usize) -> Vec<Option<Link<T,U>>> {
+
         if let Some(node) = &cursor.borrow().forward[level] {
             if node.borrow().key < *key {
                 return self.fill_update_vector(node, update, key, level);
             }
         }
-        
+
         update[level] = Some(Rc::clone(cursor));
 
         if level > 0 {
@@ -123,7 +127,6 @@ where
 
     fn search_recursive(&self, cursor: &Link<T,U>, key: T, level: usize) -> Option<U> {
         if let Some(node) = cursor.borrow().forward[level].as_ref() {
-            println!("cursor: {:?}", node.borrow().key);
             if node.borrow().key < key {
                 return self.search_recursive(&node, key, level);
             }
@@ -134,6 +137,7 @@ where
         if level != 0 {
             return self.search_recursive(cursor, key, level-1);
         }
+
         None
     }
 
@@ -195,6 +199,22 @@ mod tests {
         for i in (0..20).rev() {
             sl.insert(i, i*i);
         }
-        sl.display();
+        for i in 0..20 {
+            assert_eq!(i*i, sl.search(i).unwrap());
+        }
+    }
+
+    #[test]
+    fn delete_test() {
+        let mut sl = SkipList::new();
+        for i in (0..20).rev() {
+            sl.insert(i, i*i);
+        }
+        for i in (0..20).step_by(4) {
+            sl.delete(i);
+        }
+        for i in (0..20).step_by(4) {
+            assert!(sl.search(i).is_none());
+        }
     }
 }

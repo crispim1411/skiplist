@@ -59,17 +59,24 @@ fn run_odd_linked_list() {
     println!("Odd list: {:?}", v);
 }
 
-#[allow(dead_code)]
 fn run_skiplist() {
     let mut skiplist: SkipList<u32, u32> = SkipList::new();
     let mut rng = rand::thread_rng();
+    println!("##### INSERT #####");
     for _ in 0..18 {
         let random: u32 = rng.gen_range(0..20);
         skiplist.insert(random, random*random);
-        skiplist.display();
     }   
+    skiplist.display();
+    println!("##### DELETE #####");
+    for _ in 0..18 {
+        let random: u32 = rng.gen_range(0..20);
+        skiplist.delete(random);
+    }  
+    skiplist.display();
 }
 
+#[allow(dead_code)]
 fn run_str_skiplist(){
     #[derive(Debug, Default, Clone)]
     struct StudentInfo {
@@ -115,19 +122,10 @@ fn run_str_skiplist(){
     skiplist.insert(std3.mat.clone(), std3);
     skiplist.insert(std4.mat.clone(), std4);
     skiplist.display();
-    if let Some(content) = skiplist.search("1560020".to_string()) {
-        println!("{:?}\n", content);
-    } 
-    else {
-        println!("Usuário não encontrado")
-    }
+    skiplist.delete("1510090".to_string());
+    skiplist.display();
 }
 
 fn main() {
-    // run_stack();
-    // println!("\n");
-    // run_random_linked_list();
-    // println!("\n");
-    // run_odd_linked_list();
-    run_str_skiplist();
+    run_skiplist();
 }
