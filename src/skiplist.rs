@@ -43,18 +43,18 @@ where
             println!("Skiplist is empty.");
             return
         }
-        self.recursive_display(&self.head, self.level);
+        self.display_recursive(&self.head, self.level);
         println!();
     }
 
-    fn recursive_display(&self, cursor: &Link<T,U>, level: usize) {
+    fn display_recursive(&self, cursor: &Link<T,U>, level: usize) {
         if let Some(node) = cursor.borrow().forward[level].as_ref() {
             print!("[{:?}] -> ", node.borrow().key);
-            return self.recursive_display(&node, level);
+            return self.display_recursive(&node, level);
         }
         println!();
         if level != 0 {
-            return self.recursive_display(&self.head, level-1);
+            return self.display_recursive(&self.head, level-1);
         }
     }
 
@@ -118,23 +118,65 @@ where
             println!("Skiplist is empty.");
             return None;
         }
-        return self.recursive_search(&self.head, key, self.level);
+        return self.search_recursive(&self.head, key, self.level);
     }
 
-    fn recursive_search(&self, cursor: &Link<T,U>, key: T, level: usize) -> Option<U> {
+    fn search_recursive(&self, cursor: &Link<T,U>, key: T, level: usize) -> Option<U> {
         if let Some(node) = cursor.borrow().forward[level].as_ref() {
             println!("cursor: {:?}", node.borrow().key);
             if node.borrow().key < key {
-                return self.recursive_search(&node, key, level);
+                return self.search_recursive(&node, key, level);
             }
             if node.borrow().key == key {
                 return Some(node.borrow().value.clone())
             }
         }
         if level != 0 {
-            return self.recursive_search(cursor, key, level-1);
+            return self.search_recursive(cursor, key, level-1);
         }
         None
+    }
+
+    pub fn delete(&mut self, key: T) {
+        let update = self.fill_update_vector(&self.head, vec![None; self.level+1], &key, self.level);
+
+        let mut option_delete = None;
+        if let Some(update_node) = update[0].as_ref() {
+            if let Some(next_node) = update_node.borrow().forward[0].as_ref() {
+                if next_node.borrow().key == key {
+                    option_delete = Some(Rc::clone(next_node));
+                }
+            }
+        }
+        
+        if let Some(delete_node) = option_delete {
+            for level in 0..=self.level {                
+
+                let cursor = update[level].as_ref().unwrap();
+                if cursor.borrow().forward[level].is_none() {
+                    break;
+                }
+                else if !Rc::ptr_eq(
+                    cursor.borrow().forward[level].as_ref().unwrap(), 
+                    &delete_node) {
+                    break;
+                }
+
+                let mut delete_node_inner = delete_node.take();
+                let mut node_inner = cursor.take();
+
+                node_inner.forward[level] = delete_node_inner.forward[level].take();
+
+                cursor.replace(node_inner);
+                delete_node.replace(delete_node_inner);
+            }
+            while self.level > 1 && self.head.borrow().forward[self.level].is_none() {
+                self.level -= 1;
+            }
+        }
+        else {
+            println!("Item {:?} not found", key);
+        }
     }
 } 
 
