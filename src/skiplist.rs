@@ -2,8 +2,6 @@ use std::{rc::Rc, cell::RefCell};
 use std::fmt::Debug;
 use rand::Rng;
 
-const MAX_LEVEL: usize = 1;
-
 #[derive(Default)]
 struct Node<T,U> {
     key: T,
@@ -15,6 +13,7 @@ type Link<T,U> = Rc<RefCell<Node<T,U>>>;
 pub struct SkipList<T,U> {
     head: Link<T,U>, 
     level: usize,
+    max_level: usize,
 }
 
 impl<T, U> SkipList<T,U> 
@@ -22,16 +21,20 @@ where
     T: Default + Debug + PartialOrd,
     U: Default + Debug + Clone
 {
-    pub fn new() -> Self {
+    pub fn new(max_level: usize) -> Self {
         let mut head = Node::default();
-        head.forward = vec![None; MAX_LEVEL+1];
-        Self { head: Rc::new(RefCell::new(head)), level: 0 }
+        head.forward = vec![None; max_level+1];
+        Self { 
+            head: Rc::new(RefCell::new(head)), 
+            level: 0,
+            max_level 
+        }
     }
 
     fn random_level(&self) -> usize{
         let mut level = 0;
         let mut rng = rand::thread_rng();
-        while rng.gen::<f32>() < 0.5 && level < MAX_LEVEL {
+        while rng.gen::<f32>() < 0.5 && level < self.max_level {
             level += 1;
         }
         level
@@ -189,13 +192,13 @@ mod tests {
     use super::*;
     #[test]
     fn is_empty_test() {
-        let sl: SkipList<i16, u32> = SkipList::new();
+        let sl: SkipList<i16, u32> = SkipList::new(2);
         assert_eq!(sl.head.borrow().forward[0].is_none(), true);
     }
 
     #[test]
     fn reverse_insert_test() {
-        let mut sl = SkipList::new();
+        let mut sl = SkipList::new(2);
         for i in (0..20).rev() {
             sl.insert(i, i*i);
         }
@@ -206,7 +209,7 @@ mod tests {
 
     #[test]
     fn delete_test() {
-        let mut sl = SkipList::new();
+        let mut sl = SkipList::new(2);
         for i in (0..20).rev() {
             sl.insert(i, i*i);
         }

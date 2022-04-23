@@ -60,7 +60,7 @@ fn run_odd_linked_list() {
 }
 
 fn run_skiplist() {
-    let mut skiplist: SkipList<u32, u32> = SkipList::new();
+    let mut skiplist: SkipList<u32, u32> = SkipList::new(1);
     let mut rng = rand::thread_rng();
     println!("##### INSERT #####");
     for _ in 0..18 {
@@ -116,7 +116,7 @@ fn run_str_skiplist(){
             ("Álgebra Linear 1".to_string(), 6.4)
         ]
     };
-    let mut skiplist= SkipList::new();
+    let mut skiplist= SkipList::new(1);
     skiplist.insert(std1.mat.clone(), std1);
     skiplist.insert(std2.mat.clone(), std2);
     skiplist.insert(std3.mat.clone(), std3);
