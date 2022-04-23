@@ -125,9 +125,32 @@ fn recursive_delete(cursor: &mut Link<T>, value: T) {
 }
 ```
 ## SkipList
+- Percorrendo estrutura montando um vetor de update
+```rust
+fn fill_update_vector(&self, 
+    cursor: &Link<T,U>, 
+    mut update: Vec<Option<Link<T,U>>>, 
+    key: &T, 
+    level: usize) -> Vec<Option<Link<T,U>>> {
+
+    if let Some(node) = &cursor.borrow().forward[level] {
+        if node.borrow().key < *key {
+            return self.fill_update_vector(node, update, key, level);
+        }
+    }
+
+    update[level] = Some(Rc::clone(cursor));
+
+    if level > 0 {
+        return self.fill_update_vector(cursor, update, key, level-1);
+    }
+    update
+}
+```
+
 - Inserção
 ```rust
-pub fn insert(&mut self, key: T) {
+pub fn insert(&mut self, key: T, value: U) {
     let random_level = self.random_level();
     
     let update = self.fill_update_vector(&self.head, vec![None; random_level+1], &key, random_level);
@@ -135,7 +158,7 @@ pub fn insert(&mut self, key: T) {
     if let Some(node) = &update[0] {
         if let Some(next_node) = node.borrow().forward[0].as_ref() {
             if next_node.borrow().key == key {
-                println!("Item {:?} - update not implemented", key);
+                println!("Item {:?} already inserted", key);
                 return
             }
         }
@@ -144,6 +167,7 @@ pub fn insert(&mut self, key: T) {
     let new_node = Rc::new(RefCell::new(
         Node { 
             key, 
+            value,
             forward: vec![None; random_level+1]
         }
     ));
@@ -160,27 +184,55 @@ pub fn insert(&mut self, key: T) {
         node_inner.forward[level] = Some(Rc::clone(&new_node));
         node.replace(node_inner);
     }
-    
+
     if random_level > self.level {
         self.level = random_level
     }
 }
 ```
 
-- Percorrendo estrutura montando um vetor de update
+- Remoção
 ```rust
-fn fill_update_vector(&self, cursor: &Link<T>, mut update: Vec<Option<Link<T>>>, key: &T, level: usize) -> Vec<Option<Link<T>>> {
-    if let Some(node) = &cursor.borrow().forward[level] {
-        if node.borrow().key < *key {
-            return self.fill_update_vector(node, update, key, level);
+pub fn delete(&mut self, key: T) {
+    let update = self.fill_update_vector(&self.head, vec![None; self.level+1], &key, self.level);
+
+    let mut option_delete = None;
+    if let Some(update_node) = update[0].as_ref() {
+        if let Some(next_node) = update_node.borrow().forward[0].as_ref() {
+            if next_node.borrow().key == key {
+                option_delete = Some(Rc::clone(next_node));
+            }
         }
     }
     
-    update[level] = Some(Rc::clone(cursor));
+    if let Some(delete_node) = option_delete {
+        for level in 0..=self.level {                
 
-    if level > 0 {
-        return self.fill_update_vector(cursor, update, key, level-1);
+            let cursor = update[level].as_ref().unwrap();
+            if cursor.borrow().forward[level].is_none() {
+                break;
+            }
+            else if !Rc::ptr_eq(
+                cursor.borrow().forward[level].as_ref().unwrap(), 
+                &delete_node) {
+                break;
+            }
+
+            let mut delete_node_inner = delete_node.take();
+            let mut node_inner = cursor.take();
+
+            node_inner.forward[level] = delete_node_inner.forward[level].take();
+
+            cursor.replace(node_inner);
+            delete_node.replace(delete_node_inner);
+        }
+        while self.level > 1 && self.head.borrow().forward[self.level].is_none() {
+            self.level -= 1;
+        }
     }
-    update
+    else {
+        println!("Item {:?} not found", key);
+    }
 }
 ```
+
