@@ -125,6 +125,18 @@ fn recursive_delete(cursor: &mut Link<T>, value: T) {
 }
 ```
 ## SkipList
+- Calculando level
+```rust
+fn random_level(&self) -> usize{
+    let mut level = 0;
+    let mut rng = rand::thread_rng();
+    while rng.gen::<f32>() < 0.5 && level < self.max_level {
+        level += 1;
+    }
+    level
+}
+```
+
 - Percorrendo estrutura montando um vetor de update
 ```rust
 fn fill_update_vector(&self, 
