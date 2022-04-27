@@ -1,13 +1,11 @@
 use std::fmt::Debug;
-use std::mem;
-
-type Link<T> = Option<Box<Node<T>>>;
 
 #[derive(Debug, PartialEq)]
 struct Node<T> {
     value: T,
     next: Link<T>,
 }
+type Link<T> = Option<Box<Node<T>>>;
 
 pub struct LinkedList<T> {
     head: Link<T>
@@ -41,7 +39,7 @@ impl<T> LinkedList<T> where T: Debug + PartialOrd + Debug {
         // Inserir um novo item como head
         else if value < self.head.as_ref().unwrap().value {
             let mut new_node = Node { value, next: None };
-            let old_value = mem::take(&mut self.head);
+            let old_value = self.head.take();
             new_node.next = old_value;
             self.head = Some(Box::new(new_node));
         }
@@ -59,7 +57,7 @@ impl<T> LinkedList<T> where T: Debug + PartialOrd + Debug {
                 } 
             } 
             let mut new_node = Node { value, next: None };
-            let old_value = mem::take(&mut node.next);
+            let old_value = node.next.take();
             new_node.next = old_value;
             node.next = Some(Box::new(new_node));
         }
@@ -68,7 +66,7 @@ impl<T> LinkedList<T> where T: Debug + PartialOrd + Debug {
     pub fn delete(&mut self, value: T) {
         if let Some(head_node) = &mut self.head{
             if head_node.value == value {
-                let old_value = mem::take(&mut self.head);
+                let old_value = self.head.take();
                 self.head = old_value.unwrap().next;
             } else {
                 LinkedList::recursive_delete(&mut self.head, value);
@@ -82,7 +80,7 @@ impl<T> LinkedList<T> where T: Debug + PartialOrd + Debug {
         if let Some(node) = cursor {
             if let Some(next_node) = &mut node.next {
                 if next_node.value == value {
-                    let old_value = mem::take(&mut node.next);
+                    let old_value = node.next.take();
                     node.next = old_value.unwrap().next;
                 }
                 else if next_node.value < value {
