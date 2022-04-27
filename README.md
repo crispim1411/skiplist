@@ -41,7 +41,10 @@ Manter uma estrutura onde o nível acima é sempre a metade do nível anterior �
 
 # Implementação
 ## Stack
-- Inserir na pilha
+### Inserção
+1. Toma o conteúdo do head da stack, deixando valor default
+1. Cria um novo item dando o head como próximo 
+1. Insere o item como novo head
 ```rust
 pub fn push(&mut self, value: T) {
     let old_head = self.head.take();
@@ -52,7 +55,11 @@ pub fn push(&mut self, value: T) {
     self.head = Some(Box::new(new_head));
 }
 ```
-- Remover da pilha 
+
+### Pop
+1. Toma o conteúdo do head da stack, deixando valor default
+1. Verifica se há conteúdo (Option)
+1. Retorna conteúdo ou vazio
 ```rust
 pub fn pop(&mut self) -> Option<T> {
     let old_head = self.head.take();
@@ -66,7 +73,10 @@ pub fn pop(&mut self) -> Option<T> {
 }
 ```
 
-- Olhar o topo da pilha
+### Peek
+1. Verifica o head da stack (Option)
+1. Retorna referência ou vazio
+
 ```rust
 pub fn peek(&self) -> Option<&T> {
     match &self.head {
@@ -75,9 +85,12 @@ pub fn peek(&self) -> Option<&T> {
     }
 }
 ```
-
+---
 ## Linked List
-- Pesquisa recursiva retornando referência de nó
+### Busca
+1. Se o valor do próximo do cursor for menor
+    1. próximo vira cursor
+1. Senão retorna referência do cursor
 ```rust
 fn get_node_ref<'a>(&self, cursor: &'a Link<T>, key: &T) -> &'a Link<T> {
     if let Some(node) = cursor.as_ref() {
@@ -91,7 +104,12 @@ fn get_node_ref<'a>(&self, cursor: &'a Link<T>, key: &T) -> &'a Link<T> {
 }
 ```
 
-- Inserir um novo nó recursivamente
+### Inserção
+1. Se o valor do próximo do cursor for menor
+    1. Próximo vira cursor
+1. Senão toma o valor do próximo ao cursor
+1. O novo item recebe o valor tomado como próximo
+1. Se torna o novo próximo do cursor
 ```rust
 fn recursive_insert(cursor: &mut Link<T>, value: T) {
     if let Some(node) = cursor {
@@ -108,7 +126,12 @@ fn recursive_insert(cursor: &mut Link<T>, value: T) {
 }
 ```
 
-- Remover um nó recursivamente
+### Remoção
+1. Se o valor do próximo do cursor for igual
+    1. Toma o valor do próximo
+    1. Redireciona o próximo do removido para ser o próximo do cursor
+1. Senão se o valor do próximo for menor
+    1. Próximo vira cursor
 ```rust
 fn recursive_delete(cursor: &mut Link<T>, value: T) {
     if let Some(node) = cursor {
@@ -124,20 +147,15 @@ fn recursive_delete(cursor: &mut Link<T>, value: T) {
     }
 }
 ```
+---
 ## SkipList
-- Calculando level
-```rust
-fn random_level(&self) -> usize{
-    let mut level = 0;
-    let mut rng = rand::thread_rng();
-    while rng.gen::<f32>() < 0.5 && level < self.max_level {
-        level += 1;
-    }
-    level
-}
-```
-
-- Percorrendo estrutura montando um vetor de update
+### Vetor de update 
+1. Se o valor do próximo do cursor no nível for menor
+    1. O próximo vira cursor
+1. Senão preenche o vetor na posição do nível
+1. Se não estiver no nível zero
+    1. Repete para o nível-1
+1. Senão retorna o vetor
 ```rust
 fn fill_update_vector(&self, 
     cursor: &Link<T,U>, 
@@ -160,7 +178,20 @@ fn fill_update_vector(&self,
 }
 ```
 
-- Inserção
+### Inserção
+1. Calcula nível randômico para o item
+1. Preenche vetor de update
+1. Se o valor do próximo ao update for igual ao dado
+    1. Item já cadastrado, retorna
+1. Senão do nível zero até o nível do novo item
+1. Toma o valor do vetor update[nível]
+1. Toma o valor do novo item 
+1. Próximo do novo item no nível será o próximo do vetor[nível]
+1. Replace do novo item tomado
+1. Próximo do item update[nível] será o novo item
+1. Replace do item update[nível] tomado
+1. Se o nível do novo item for maior que o nível atual da estrutura
+    1. Estrutura recebe nível
 ```rust
 pub fn insert(&mut self, key: T, value: U) {
     let random_level = self.random_level();
@@ -203,7 +234,23 @@ pub fn insert(&mut self, key: T, value: U) {
 }
 ```
 
-- Remoção
+### Remoção
+1. Preenche vetor de update
+1. Se o valor do próximo ao update for igual ao dado
+    1. Preenche item alvo
+1. Se item alvo preenchido
+    1. Do nível zero até o nível da estrutura
+    1. Se próximo de update[nível] for nulo
+        1. Retorna
+    1. Se próximo de update[nível] não apontar para o item alvo
+        1. Retorna
+    1. Toma o valor do item alvo 
+    1. Toma valor de update[nível]
+    1. Redireciona o próximo[nível] do removido para ser o próximo de update[nível]
+    1. Replace do item update[nível] tomado
+    1. Replace do item removido
+1. Senão item não consta na estrutura
+ 
 ```rust
 pub fn delete(&mut self, key: T) {
     let update = self.fill_update_vector(&self.head, vec![None; self.level+1], &key, self.level);
