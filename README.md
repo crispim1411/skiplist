@@ -294,4 +294,12 @@ pub fn delete(&mut self, key: T) {
     }
 }
 ```
+---
+## Considerações Finais
+- O dado da SkipList foi englobado numa estrutura Rc para permitir múltiplas referências ao objeto 
+- Cogitou-se utilizar internamente uma estrutura Cell porém não se mostrou possível implementar Copy para cumprir o método Get da estrutura
+- A Reescrita de ponteiros foi feita através do esquema Take-Change-Replace
+- Esse repositório se destina ao aprendizado, logo quaisquer críticas ou dicas são bem vindas!
+
+
 
