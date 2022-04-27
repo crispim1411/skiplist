@@ -153,7 +153,7 @@ fn recursive_delete(cursor: &mut Link<T>, value: T) {
 1. Se o valor do próximo do cursor no nível for menor
     1. O próximo vira cursor
 1. Senão preenche o vetor na posição do nível
-1. Se não estiver no nível zero
+1. Se nível maior que zero
     1. Repete para o nível-1
 1. Senão retorna o vetor
 ```rust
@@ -184,12 +184,12 @@ fn fill_update_vector(&self,
 1. Se o valor do próximo ao update for igual ao dado
     1. Item já cadastrado, retorna
 1. Senão do nível zero até o nível do novo item
-1. Toma o valor do vetor update[nível]
-1. Toma o valor do novo item 
-1. Próximo do novo item no nível será o próximo do vetor[nível]
-1. Replace do novo item tomado
-1. Próximo do item update[nível] será o novo item
-1. Replace do item update[nível] tomado
+    1. Toma o valor do vetor update[nível]
+    1. Toma o valor do novo item 
+    1. Próximo do novo item no nível será o próximo do vetor[nível]
+    1. Replace do novo item tomado
+    1. Próximo do item update[nível] será o novo item
+    1. Replace do item update[nível] tomado
 1. Se o nível do novo item for maior que o nível atual da estrutura
     1. Estrutura recebe nível
 ```rust
@@ -240,15 +240,15 @@ pub fn insert(&mut self, key: T, value: U) {
     1. Preenche item alvo
 1. Se item alvo preenchido
     1. Do nível zero até o nível da estrutura
-    1. Se próximo de update[nível] for nulo
-        1. Retorna
-    1. Se próximo de update[nível] não apontar para o item alvo
-        1. Retorna
-    1. Toma o valor do item alvo 
-    1. Toma valor de update[nível]
-    1. Redireciona o próximo[nível] do removido para ser o próximo de update[nível]
-    1. Replace do item update[nível] tomado
-    1. Replace do item removido
+        1. Se próximo de update[nível] for nulo
+            1. Retorna
+        1. Se próximo de update[nível] não apontar para o item alvo
+            1. Retorna
+        1. Toma o valor do item alvo 
+        1. Toma valor de update[nível]
+        1. Redireciona o próximo[nível] do removido para ser o próximo de update[nível]
+        1. Replace do item update[nível] tomado
+        1. Replace do item removido
 1. Senão item não consta na estrutura
  
 ```rust
