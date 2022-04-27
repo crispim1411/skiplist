@@ -119,7 +119,7 @@ fn recursive_insert(cursor: &mut Link<T>, value: T) {
             } 
         } 
         let mut new_node = Node { value, next: None };
-        let old_value = mem::take(&mut node.next);
+        let old_value = node.next.take();
         new_node.next = old_value;
         node.next = Some(Box::new(new_node));
     }
@@ -137,7 +137,7 @@ fn recursive_delete(cursor: &mut Link<T>, value: T) {
     if let Some(node) = cursor {
         if let Some(next_node) = &mut node.next {
             if next_node.value == value {
-                let old_value = mem::take(&mut node.next);
+                let old_value = node.next.take();
                 node.next = old_value.unwrap().next;
             }
             else if next_node.value < value {
