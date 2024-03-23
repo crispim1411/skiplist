@@ -1,97 +1,104 @@
 use std::fmt::Debug;
 
-#[derive(Debug, PartialEq)]
 struct Node<T> {
     value: T,
-    next: Link<T>,
+    next: Option<Box<Node<T>>>,
 }
-type Link<T> = Option<Box<Node<T>>>;
 
 pub struct LinkedList<T> {
-    head: Link<T>
+    head: Option<Box<Node<T>>>
 }
 
-impl<T> LinkedList<T> where T: Debug + PartialOrd + Debug {
-    pub fn new(value: T) -> Self {
-        let node = Node { value, next: None };
-        Self {
-            head: Some(Box::new(node))
+impl<T> LinkedList<T> where T: PartialOrd + PartialEq {
+    pub fn new() -> Self {
+        LinkedList { head: None }
+    }
+
+    pub fn show(&self) where T: Debug {
+        match &self.head {
+            Some(head) => Self::show_recursive(head),
+            None => println!("Linked List is empty")
         }
     }
 
-    pub fn empty() -> Self {
-        Self { head: None }
+    fn show_recursive(cursor: &Box<Node<T>>) where T: Debug {
+        print!("[{:?}]", cursor.value);
+        match &cursor.next {
+            Some(next_item) => Self::show_recursive(next_item),
+            None => print!("End")
+        }
     }
 
-    pub fn display(&self) {
-        let mut cursor = &self.head;
-        while let Some(node) = cursor {
-            println!("{:?}", node.value);
-            cursor = &node.next;
-        }
+    pub fn insert_with_logs(&mut self, value: T) where T: Debug {
+        println!("Inserting {value:?}");
+        self.insert(value);
     }
 
     pub fn insert(&mut self, value: T) {
-        // Lista vazia
-        if self.head == None {
-            self.head = Some(Box::new(Node { value, next: None }));
-        } 
-        // Inserir um novo item como head
-        else if value < self.head.as_ref().unwrap().value {
-            let mut new_node = Node { value, next: None };
-            let old_value = self.head.take();
-            new_node.next = old_value;
+        let Some(head) =  &mut self.head else {
+            let new_item = Node { value, next: None };
+            self.head = Some(Box::new(new_item));
+            return
+        };
+
+        if value < head.value {
+            let head_node = std::mem::take(&mut self.head);
+            let new_node = Node { value, next: head_node };
             self.head = Some(Box::new(new_node));
         }
-        // Busca e inserção
         else  {
-            LinkedList::recursive_insert(&mut self.head, value);
+            LinkedList::recursive_insert(head, value);
         }
     }
 
-    fn recursive_insert(cursor: &mut Link<T>, value: T) {
-        if let Some(node) = cursor {
-            if let Some(next_node) = &mut node.next {
-                if next_node.value < value {
-                    return LinkedList::recursive_insert(&mut node.next, value);
-                } 
-            } 
-            let mut new_node = Node { value, next: None };
-            let old_value = node.next.take();
-            new_node.next = old_value;
-            node.next = Some(Box::new(new_node));
+    fn recursive_insert(cursor: &mut Box<Node<T>>, value: T) {
+        if let Some(next_node) = &mut cursor.next {
+            if next_node.value < value {
+                return Self::recursive_insert(next_node, value);
+            }
+            let bigger_node = std::mem::take(&mut cursor.next);
+            let new_node = Node { value, next: bigger_node };
+            cursor.next = Some(Box::new(new_node));
+            return
         }
+        let new_node = Node { value, next: None };
+        cursor.next = Some(Box::new(new_node));
     }
 
     pub fn delete(&mut self, value: T) {
-        if let Some(head_node) = &mut self.head{
-            if head_node.value == value {
-                let old_value = self.head.take();
-                self.head = old_value.unwrap().next;
-            } else {
-                LinkedList::recursive_delete(&mut self.head, value);
-            }
+        let Some(head) = &mut self.head else {
+            println!("Linked List is empty");
+            return
+        };
+
+        if head.value == value {
+            self.head = std::mem::take(&mut head.next);
+        } else if head.value < value {
+            Self::recursive_delete(head, value)
         } else {
-            println!("Empty list");
+            println!("Value not found");
         }
     }
 
-    fn recursive_delete(cursor: &mut Link<T>, value: T) {
-        if let Some(node) = cursor {
-            if let Some(next_node) = &mut node.next {
-                if next_node.value == value {
-                    let old_value = node.next.take();
-                    node.next = old_value.unwrap().next;
-                }
-                else if next_node.value < value {
-                    LinkedList::recursive_delete(&mut node.next, value);
-                }
+    fn recursive_delete(cursor: &mut Box<Node<T>>, value: T) {
+        if let Some(next_node) = &mut cursor.next {
+            if next_node.value < value {
+                return Self::recursive_delete(next_node, value);
+            } else if next_node.value == value {
+                cursor.next = std::mem::take(&mut next_node.next);
+                return
             }
         }
+        println!("Value not found");
     }
 
     #[allow(dead_code)]
-    fn get_node_ref<'a>(&self, cursor: &'a Link<T>, key: &T) -> &'a Link<T> {
+    fn get_node_ref<'a>(
+        &self, 
+        cursor: &'a Option<Box<Node<T>>>, 
+        key: &T
+    ) -> &'a Option<Box<Node<T>>> 
+    where T: PartialEq + PartialOrd {
         if let Some(node) = cursor.as_ref() {
             if let Some(next_node) = node.next.as_ref() {
                 if next_node.value < *key {
@@ -120,14 +127,8 @@ impl<T: Clone> Iterator for LinkedList<T> {
 mod tests {
     use super::*;
     #[test]
-    fn is_empty_test() {
-        let empty_list: LinkedList<u32> = LinkedList::empty();
-        assert_eq!(empty_list.head, None);
-    }
-
-    #[test]
     fn get_ref_test(){
-        let mut list = LinkedList::new(2);
+        let mut list = LinkedList::new();
         list.insert(7);
         list.insert(3);
         list.insert(5);
@@ -137,7 +138,7 @@ mod tests {
 
     #[test]
     fn insert_test() {
-        let mut list = LinkedList::new(8);
+        let mut list = LinkedList::new();
         list.insert(2);
         list.insert(7);
         list.insert(3);
@@ -149,7 +150,7 @@ mod tests {
 
     #[test]
     fn delete_test() {
-        let mut list = LinkedList::new(8);
+        let mut list = LinkedList::new();
         list.insert(2);
         list.insert(7);
         list.insert(3);
@@ -163,15 +164,15 @@ mod tests {
 
     #[test]
     fn delete_one_item_test() {
-        let mut list = LinkedList::empty();
+        let mut list = LinkedList::new();
         list.insert(324);
         list.delete(324);
-        assert_eq!(list.head, None);
+        assert!(list.head.is_none());
     }
 
     #[test]
     fn iter_test() {
-        let mut list = LinkedList::empty();
+        let mut list = LinkedList::new();
         for i in (0..20).rev() {
             list.insert(i);
         }

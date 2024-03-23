@@ -1,45 +1,63 @@
 use std::fmt::Debug;
 
-#[derive(Debug)]
 struct Item<T> {
     value: T,
-    next: Link<T>,
+    next: Option<Box<Item<T>>>,
 }
-type Link<T> = Option<Box<Item<T>>>;
 
 pub struct Stack<T> {
-    head: Link<T>
+    top: Option<Box<Item<T>>>
 }
 
-impl<T: Debug> Stack<T> {
+impl<T> Stack<T> {
     pub fn empty() -> Self {
-        Self { head: None }
+        Stack { top: None }
     }
 
     pub fn push(&mut self, value: T) {
-        let old_head = self.head.take();
-        let new_head = Item {
+        let top = std::mem::take(&mut self.top);
+        let new_top = Item {
             value,
-            next: old_head,
+            next: top
         };
-        self.head = Some(Box::new(new_head));
+        self.top = Some(Box::new(new_top))
+    }
+
+    pub fn push_with_log(&mut self, value: T) where T: Debug {
+        println!("Inserting {value:?}");
+        self.push(value);
     }
 
     pub fn pop(&mut self) -> Option<T> {
-        let old_head = self.head.take();
-        match old_head {
+        let top = std::mem::take(&mut self.top);
+        match top {
             Some(item) => {
-                self.head = item.next;
-                Some(item.value)
-            }
-            None => None,
+                self.top = item.next;
+                return Some(item.value);
+            },
+            None => None
         }
     }
 
     pub fn peek(&self) -> Option<&T> {
-        match &self.head {
-            Some(item) => Some(&item.as_ref().value),
+        match &self.top {
+            Some(item) => Some(&item.value),
             None => None,
+        }
+    }
+
+    pub fn show(&self) where T: Debug {
+        match &self.top {
+            Some(item) => Self::show_recursive(item),
+            None => println!("Stack is empty")
+        }
+    }
+
+    fn show_recursive(cursor: &Box<Item<T>>) where T: Debug {
+        print!("[{:?}] -> ", cursor.value);
+        match &cursor.next {
+            Some(next_item) => Self::show_recursive(next_item),
+            None => print!("End")
         }
     }
 }
